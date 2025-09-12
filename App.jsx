@@ -6,7 +6,8 @@ import Bg1 from '../silentvoice/bg1.jpeg';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Tabs from './component/tabs';
-
+import Login from './screens/login';
+import Signup from './screens/signup';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +30,7 @@ function HomeScreen({ navigation }) {
         </Text>
         <Pressable
           style={[styles.button, { backgroundColor: button }]}
-          onPress={() => navigation.navigate('Tabs')}
+          onPress={() => navigation.navigate('Login')}
         >
           <Text style={[styles.buttonText, { color: ButtonTextColor }]}>
             Off to main menu
@@ -46,6 +47,8 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Tabs" component={Tabs} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Signup" component={Signup} />
       </Stack.Navigator>
     </NavigationContainer>
   );

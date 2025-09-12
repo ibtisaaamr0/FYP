@@ -34,7 +34,7 @@ export default function Tabs() {
         tabBarInactiveTintColor: 'lightgray',
         tabBarBackground: () => (
         <LinearGradient
-        colors={["#108dc7", "#ef8e38"]} // gradient colors
+        colors={["#003973", "#1f7567ff"]} // gradient colors
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={{ flex: 1 ,height: 60}}

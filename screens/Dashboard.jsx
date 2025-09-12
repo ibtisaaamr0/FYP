@@ -1,133 +1,167 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-import Logo from '../logo.png'
-import * as Animatable from 'react-native-animatable'
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import LinearGradient from 'react-native-linear-gradient';
-
-
+import React from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import * as Animatable from "react-native-animatable";
+import Logo from "../logo.png";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 export default function Dashboard({ navigation }) {
-
-
-
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#108dc7", "#ef8e38"]} // gradient colors
-        style={styles.top}
-      >
-        <Animatable.Image source={Logo}
-          alt='logo'
+      {/* Top Section */}
+      <LinearGradient colors={["#012d58", "#3b658f"]} style={styles.top}>
+        <Animatable.Image
+          source={Logo}
           style={styles.logo}
           animation="fadeInDown"
           delay={800}
           duration={600}
         />
-        <Animatable.Text style={styles.text} animation="fadeInDown"
+        <Animatable.Text
+          style={styles.text}
+          animation="fadeInDown"
           delay={800}
-          duration={600}>Silent Voice</Animatable.Text>
+          duration={600}
+        >
+          Silent Voice
+        </Animatable.Text>
       </LinearGradient>
 
+      {/* White Rounded Section */}
+      <View style={styles.bottomBox}>
+        <Text style={styles.heading}>Dashboard</Text>
 
-      <View style={{ display: "flex", justifyContent: "center", alignItems: "center", height: '100%' }}>
-
-        <LinearGradient
-          colors={["#c1ebff5d", "#ff9f4a7a"]} // gradient colors
-          style={styles.secondpart}      >
-          <Animatable.View style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly", gap: "25", position: "absolute", top: "15", height: "90%", left: "10" }} animation="fadeInUp" delay={800} duration={1000}>
-            <LinearGradient
-              colors={["#0e9bd3f8", "#ffffffff"]} // gradient colors
-              style={styles.options}
+        {/* Options Row */}
+        <Animatable.View
+          style={styles.optionsRow}
+          animation="fadeInUp"
+          delay={800}
+          duration={1000}
+        >
+          {/* Use Sign */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Sign")}
             >
-              <Pressable style={[styles.pressable, { flex: 1, backgroundColor: "transparent" }]}>
-                <FontAwesome5 name="sign-language" size={30} color="#000" />
-                <Text style={styles.optionsText}>Use Sign</Text>
-              </Pressable>
-            </LinearGradient>
+              <FontAwesome5 name="sign-language" size={30} color="#000" />
+              <Text style={styles.optionsText}>Use Sign</Text>
+            </Pressable>
+          </LinearGradient>
 
-            <LinearGradient
-              colors={["#0e9bd3f8", "#ffffffff"]} // gradient colors
-              style={styles.options}
+          {/* Use Voice/Text */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Voice")}
             >
-              <Pressable style={[styles.pressable, { flex: 1, backgroundColor: "transparent" }]}>
-                <MaterialIcons name="mic" size={40} color="#000" />
-                <Text style={styles.optionsText}>Use Text/Voice</Text>
-              </Pressable>
-            </LinearGradient>
+              <MaterialIcons name="mic" size={40} color="#000" />
+              <Text style={styles.optionsText}>Use Text/Voice</Text>
+            </Pressable>
+          </LinearGradient>
 
-            <LinearGradient
-              colors={["#0e9bd3f8", "#ffffffff"]} // gradient colors
-              style={styles.options}
+          {/* Quiz */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Quiz")}
             >
-              <Pressable style={[styles.pressable, { flex: 1, backgroundColor: "transparent" }]}>
-                <MaterialIcons name="quiz" size={30} color="#000" />
-                <Text style={styles.optionsText}>Quiz</Text>
-              </Pressable>
-            </LinearGradient>
-          </Animatable.View>
-        </LinearGradient>
+              <MaterialIcons name="quiz" size={30} color="#000" />
+              <Text style={styles.optionsText}>Quiz</Text>
+            </Pressable>
+          </LinearGradient>
+        </Animatable.View>
+
+        {/* Third Section */}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={1200}
+          style={styles.thirdpartWrapper}
+        >
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.thirdpart}>
+            <Text style={{ color: "black", fontSize: 16 }}>3rd portion</Text>
+          </LinearGradient>
+        </Animatable.View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: "white",
-    width: "50%"
-  },
+  container: { flex: 1, backgroundColor: "#bbb" },
+
   top: {
-    backgroundColor: "#5C0D0D",
-    display: "flex",
-    flexDirection: "row",
-    position: "fixed",
-    padding: "90",
+    paddingVertical: 40,
+    alignItems: "center",
     justifyContent: "center",
-    zIndex: 1
   },
-  logo: {
-    width: "70",
-    height: "70"
+
+  logo: { width: 70, height: 80, marginBottom: 5 },
+
+  text: { fontSize: 22, fontWeight: "bold", color: "white" },
+
+  bottomBox: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    padding: 25,
+    marginTop: -30,
+    elevation: 5,
+    alignItems: "center",
   },
-  secondpart: {
-    backgroundColor: "white",
-    height: 1200,
-    padding: "46%",
-    width: "50%",
-    zIndex: 2,
-    position: "absolute",
-    borderRadius: 40,
-    elevation: 10,
+
+  heading: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#012d58",
+  },
+
+  optionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
+    marginBottom: 30,
   },
 
   options: {
-    width: "45%",
+    width: "28%",
     elevation: 5,
-    height: "13%",
     borderRadius: 15,
-    display: "flex",
-    flexDirection: "column",
+    padding: 15,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   optionsText: {
     fontSize: 12,
     fontWeight: "bold",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "5"
+    marginTop: 5,
+    textAlign: "center",
   },
 
   pressable: {
-    flex: 1,                  // fills the LinearGradient
-    justifyContent: "center", // vertical centering
-    alignItems: "center",     // horizontal centering
-  }
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  thirdpartWrapper: { alignItems: "center" },
+
+  thirdpart: {
+    padding: 40,
+    borderRadius: 20,
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    width: 250,
+  },
 });
