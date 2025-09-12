@@ -1,104 +1,167 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-import Logo from '../logo.png'
-import * as Animatable from 'react-native-animatable'
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useState } from 'react';
+import React from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import * as Animatable from "react-native-animatable";
+import Logo from "../logo.png";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-
-
-export default function Avatar({navigation}) {
-
-
-
+export default function Dashboard({ navigation }) {
   return (
     <View style={styles.container}>
-      <View style={styles.top}>
-        <Image source={Logo}
-          alt='logo'
+      {/* Top Section */}
+      <LinearGradient colors={["#012d58", "#3b658f"]} style={styles.top}>
+        <Animatable.Image
+          source={Logo}
           style={styles.logo}
+          animation="fadeInDown"
+          delay={800}
+          duration={600}
         />
-        <Text style={styles.text}>Silent Voice</Text>
-      </View>
+        <Animatable.Text
+          style={styles.text}
+          animation="fadeInDown"
+          delay={800}
+          duration={600}
+        >
+          Silent Voice
+        </Animatable.Text>
+      </LinearGradient>
 
+      {/* White Rounded Section */}
+      <View style={styles.bottomBox}>
+        <Text style={styles.heading}>Dashboard</Text>
 
-      <View style={{ display: "flex", justifyContent: "center", alignItems: "center", height: '100%' }}>
-        <View style={styles.secondpart}>
-          <Animatable.View style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly", gap: "25", position: "absolute", top: "15", height: "90%", left: "10" }} animation="fadeIn" delay={700} duration={2000}>
-            <Pressable style={[styles.options, { backgroundColor: "darkorange" }]}>
+        {/* Options Row */}
+        <Animatable.View
+          style={styles.optionsRow}
+          animation="fadeInUp"
+          delay={800}
+          duration={1000}
+        >
+          {/* Use Sign */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Sign")}
+            >
               <FontAwesome5 name="sign-language" size={30} color="#000" />
               <Text style={styles.optionsText}>Use Sign</Text>
             </Pressable>
+          </LinearGradient>
 
-            <Pressable style={[styles.options, { backgroundColor: "lightblue" }]} onPress={()=>navigation.navigate("TVS")}>
+          {/* Use Voice/Text */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Voice")}
+            >
               <MaterialIcons name="mic" size={40} color="#000" />
               <Text style={styles.optionsText}>Use Text/Voice</Text>
             </Pressable>
+          </LinearGradient>
 
-            <Pressable style={[styles.options, { backgroundColor: "brown" }]}>
+          {/* Quiz */}
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => navigation.navigate("Quiz")}
+            >
               <MaterialIcons name="quiz" size={30} color="#000" />
               <Text style={styles.optionsText}>Quiz</Text>
             </Pressable>
-          </Animatable.View>
-        </View>
+          </LinearGradient>
+        </Animatable.View>
+
+        {/* Third Section */}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={1200}
+          style={styles.thirdpartWrapper}
+        >
+          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.thirdpart}>
+            <Text style={{ color: "black", fontSize: 16 }}>3rd portion</Text>
+          </LinearGradient>
+        </Animatable.View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: "white",
-    width: "50%"
-  },
-  top: {
-    backgroundColor: "#5C0D0D",
-    display: "flex",
-    flexDirection: "row",
-    position: "fixed",
-    padding: "90",
-    justifyContent: "center",
-    zIndex: 1
-  },
-  logo: {
-    width: "70",
-    height: "70"
-  },
-  secondpart: {
-    backgroundColor: "white",
-    height: 1200,
-    padding: "46%",
-    width: "60%",
-    zIndex: 2,
-    position: "absolute",
-    borderRadius: 40,
-    borderColor:"black",
-    borderWidth:2,
+  container: { flex: 1, backgroundColor: "#bbb" },
 
+  top: {
+    paddingVertical: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  logo: { width: 70, height: 80, marginBottom: 5 },
+
+  text: { fontSize: 22, fontWeight: "bold", color: "white" },
+
+  bottomBox: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    padding: 25,
+    marginTop: -30,
+    elevation: 5,
+    alignItems: "center",
+  },
+
+  heading: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#012d58",
+  },
+
+  optionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
+    marginBottom: 30,
   },
 
   options: {
-    width: "45%",
-
-    height: "13%",
+    width: "28%",
+    elevation: 5,
     borderRadius: 15,
-    display: "flex",
-    flexDirection: "column",
+    padding: 15,
     alignItems: "center",
-    justifyContent: "center"
-
+    justifyContent: "center",
   },
 
   optionsText: {
     fontSize: 12,
     fontWeight: "bold",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
+    marginTop: 5,
+    textAlign: "center",
+  },
+
+  pressable: {
     justifyContent: "center",
-    marginTop:"5"
-  }
+    alignItems: "center",
+  },
+
+  thirdpartWrapper: { alignItems: "center" },
+
+  thirdpart: {
+    padding: 40,
+    borderRadius: 20,
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    width: 250,
+  },
 });
