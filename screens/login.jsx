@@ -94,6 +94,8 @@ const styles = StyleSheet.create({
 
   top: {
     paddingVertical: 40,
+    display:"flex",
+    flexDirection:"row",
     alignItems: "center",
     justifyContent: "center",
   },

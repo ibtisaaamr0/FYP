@@ -1,167 +1,179 @@
 import React from "react";
 import {
   View,
-  StyleSheet,
   Text,
+  StyleSheet,
+  Image,
   Pressable,
+  ScrollView,
 } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
 import * as Animatable from "react-native-animatable";
-import Logo from "../logo.png";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import LinearGradient from "react-native-linear-gradient";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import AvatarImg from "../avatar.jpeg"; // replace with your avatar image
 
-export default function Dashboard({ navigation }) {
+export default function Avatar({ navigation }) {
   return (
-    <View style={styles.container}>
-      {/* Top Section */}
-      <LinearGradient colors={["#012d58", "#3b658f"]} style={styles.top}>
-        <Animatable.Image
-          source={Logo}
-          style={styles.logo}
-          animation="fadeInDown"
-          delay={800}
-          duration={600}
-        />
-        <Animatable.Text
-          style={styles.text}
-          animation="fadeInDown"
-          delay={800}
-          duration={600}
-        >
-          Silent Voice
-        </Animatable.Text>
-      </LinearGradient>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.helloText}>Your Avatar 🧍</Text>
+          <Text style={styles.subtitle}>
+            Interact, customize, and bring your sign to life
+          </Text>
+        </View>
+        <Image source={AvatarImg} style={styles.avatar} />
+      </View>
 
-      {/* White Rounded Section */}
-      <View style={styles.bottomBox}>
-        <Text style={styles.heading}>Dashboard</Text>
+      {/* Avatar Card */}
+      <Animatable.View
+        animation="fadeInUp"
+        delay={200}
+        style={styles.avatarCard}
+      >
+        <LinearGradient colors={["#A1C4FD", "#C2E9FB"]} style={styles.gradientBox}>
+          <Image source={AvatarImg} style={styles.avatarImage} />
+        </LinearGradient>
+        <Text style={styles.cardTitle}>3D Animated Avatar</Text>
+        <Text style={styles.cardSubtitle}>Your digital communication partner</Text>
+      </Animatable.View>
 
-        {/* Options Row */}
-        <Animatable.View
-          style={styles.optionsRow}
-          animation="fadeInUp"
-          delay={800}
-          duration={1000}
-        >
-          {/* Use Sign */}
-          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
-            <Pressable
-              style={styles.pressable}
-              onPress={() => navigation.navigate("Sign")}
-            >
-              <FontAwesome5 name="sign-language" size={30} color="#000" />
-              <Text style={styles.optionsText}>Use Sign</Text>
-            </Pressable>
-          </LinearGradient>
-
-          {/* Use Voice/Text */}
-          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
-            <Pressable
-              style={styles.pressable}
-              onPress={() => navigation.navigate("Voice")}
-            >
-              <MaterialIcons name="mic" size={40} color="#000" />
-              <Text style={styles.optionsText}>Use Text/Voice</Text>
-            </Pressable>
-          </LinearGradient>
-
-          {/* Quiz */}
-          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.options}>
-            <Pressable
-              style={styles.pressable}
-              onPress={() => navigation.navigate("Quiz")}
-            >
-              <MaterialIcons name="quiz" size={30} color="#000" />
-              <Text style={styles.optionsText}>Quiz</Text>
-            </Pressable>
-          </LinearGradient>
+      {/* Action Buttons */}
+      <View style={styles.iconRow}>
+        <Animatable.View animation="fadeInUp" delay={400}>
+          <Pressable
+            onPress={() => alert("Starting Animation...")}
+            style={[styles.iconBox, { backgroundColor: "#FFE6E6" }]}
+          >
+            <MaterialIcons name="play-circle-fill" size={32} color="#E53935" />
+            <Text style={styles.iconText}>Start</Text>
+          </Pressable>
         </Animatable.View>
 
-        {/* Third Section */}
-        <Animatable.View
-          animation="fadeInUp"
-          delay={1200}
-          style={styles.thirdpartWrapper}
-        >
-          <LinearGradient colors={["#0e9bd3f8", "#ffffffff"]} style={styles.thirdpart}>
-            <Text style={{ color: "black", fontSize: 16 }}>3rd portion</Text>
-          </LinearGradient>
+        <Animatable.View animation="fadeInUp" delay={600}>
+          <Pressable
+            onPress={() => navigation.navigate("Customize")}
+            style={[styles.iconBox, { backgroundColor: "#E3F2FD" }]}
+          >
+            <FontAwesome5 name="user-edit" size={26} color="#1E88E5" />
+            <Text style={styles.iconText}>Customize</Text>
+          </Pressable>
+        </Animatable.View>
+
+        <Animatable.View animation="fadeInUp" delay={800}>
+          <Pressable
+            onPress={() => alert("Avatar Settings")}
+            style={[styles.iconBox, { backgroundColor: "#FFF8E1" }]}
+          >
+            <MaterialIcons name="settings" size={28} color="#F9A825" />
+            <Text style={styles.iconText}>Settings</Text>
+          </Pressable>
         </Animatable.View>
       </View>
-    </View>
+
+      {/* Info Section */}
+      <Animatable.View animation="fadeInUp" delay={1000} style={styles.bottomCard}>
+        <Text style={styles.bottomText}>
+          “Your avatar adapts to your expressions and gestures, helping you
+          communicate naturally through sign language.”
+        </Text>
+      </Animatable.View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#bbb" },
-
-  top: {
-    paddingVertical: 40,
+  container: {
+    flex: 1,
+    backgroundColor: "#F8FBFF",
+    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  helloText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+  },
+  subtitle: {
+    fontSize: 13,
+    color: "#777",
+    marginTop: 4,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  avatarCard: {
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    elevation: 5,
+    paddingVertical: 25,
+    marginTop: 30,
+  },
+  gradientBox: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     alignItems: "center",
     justifyContent: "center",
-  },
-
-  logo: { width: 70, height: 80, marginBottom: 5 },
-
-  text: { fontSize: 22, fontWeight: "bold", color: "white" },
-
-  bottomBox: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    padding: 25,
-    marginTop: -30,
     elevation: 5,
-    alignItems: "center",
   },
-
-  heading: {
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
+  avatarImage: {
+    width: 120,
+    height: 130,
+    resizeMode: "contain",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 15,
     color: "#012d58",
   },
-
-  optionsRow: {
+  cardSubtitle: {
+    fontSize: 13,
+    color: "#777",
+    marginTop: 4,
+  },
+  iconRow: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
-    marginBottom: 30,
+    justifyContent: "space-between",
+    marginTop: 30,
   },
-
-  options: {
-    width: "28%",
-    elevation: 5,
-    borderRadius: 15,
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  optionsText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    marginTop: 5,
-    textAlign: "center",
-  },
-
-  pressable: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  thirdpartWrapper: { alignItems: "center" },
-
-  thirdpart: {
-    padding: 40,
+  iconBox: {
+    width: 100,
+    height: 100,
     borderRadius: 20,
-    height: 150,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
-    width: 250,
+  },
+  iconText: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#333",
+  },
+  bottomCard: {
+    backgroundColor: "#F5F7FA",
+    borderRadius: 20,
+    padding: 20,
+    marginVertical: 30,
+  },
+  bottomText: {
+    fontSize: 13,
+    color: "#444",
+    textAlign: "center",
+    lineHeight: 18,
   },
 });

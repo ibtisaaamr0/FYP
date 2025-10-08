@@ -12,10 +12,16 @@ import { signupUser } from "../component/auth";
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
   const handleSignup = async () => {
     try {
-      await signupUser(email, password);
+      if (!email || !password || !name) {
+        Alert.alert("Error", "Please fill in all fields.");
+        return;
+      }
+
+      await signupUser(email, password, name);
       Alert.alert("Success", "Account created!");
       navigation.navigate("Login"); // back to login
     } catch (error) {
@@ -34,6 +40,13 @@ export default function Signup({ navigation }) {
         style={styles.input}
         autoCapitalize="none"
         keyboardType="email-address"
+      />
+
+      <TextInput
+        placeholder="Enter name"
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
       />
 
       <TextInput
