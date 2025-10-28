@@ -23,7 +23,7 @@ export default function Signup({ navigation }) {
 
       await signupUser(email, password, name);
       Alert.alert("Success", "Account created!");
-      navigation.navigate("Login"); // back to login
+      navigation.navigate("Login"); 
     } catch (error) {
       Alert.alert("Signup Error", error.message);
     }

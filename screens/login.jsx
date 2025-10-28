@@ -28,7 +28,6 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Top Section */}
       <LinearGradient colors={["#012d58", "#3b658f"]} style={styles.top}>
         <Animatable.Image
           source={Logo}
@@ -47,7 +46,6 @@ export default function Login({ navigation }) {
         </Animatable.Text>
       </LinearGradient>
 
-      {/* White Rounded Section */}
       <View style={styles.bottomBox}>
         <Text style={styles.heading}>Log In</Text>
 
@@ -110,7 +108,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     padding: 25,
-    marginTop: -30, // lifts the white box up a little
+    marginTop: -30,
     elevation: 5,
   },
 

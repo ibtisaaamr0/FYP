@@ -30,19 +30,19 @@ export default function Tabs() {
         tabBarIcon: ({ focused, size }) => {
           let iconName;
           let IconComponent = FontAwesome5;
-          let activeColor = '#FF6B35'; // orange accent like in your reference
-          let inactiveColor = '#A9A9A9'; // light gray
+          let activeColor = '#FF6B35';
+          let inactiveColor = '#A9A9A9'; 
 
           if (route.name === 'Dashboard') {
             iconName = 'home';
           } else if (route.name === 'Avatar') {
             iconName = 'person';
             IconComponent = MaterialIcons;
-            activeColor = '#6C63FF'; // purple accent
+            activeColor = '#6C63FF'; 
           } else if (route.name === 'Profile') {
             iconName = 'settings';
             IconComponent = MaterialIcons;
-            activeColor = '#FFD54F'; // yellow accent
+            activeColor = '#FFD54F'; 
           }
 
           return (
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
+
     height: 65,
     backgroundColor: '#FFFFFF',
     borderRadius: 25,
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
+
     shadowOffset: { width: 0, height: 4 },
   },
   iconContainer: {
@@ -86,6 +88,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   indicator: {
+    
     width: 6,
     height: 6,
     borderRadius: 3,

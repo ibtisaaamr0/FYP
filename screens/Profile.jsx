@@ -27,13 +27,13 @@ export default function Profile() {
           style: "destructive",
           onPress: async () => {
             try {
-              await logoutUser(); // ✅ Firebase sign-out
+              await logoutUser(); 
               console.log("User logged out successfully");
 
-              // ✅ Reset navigation stack to your App.jsx (start screen)
+            
               navigation.reset({
                 index: 0,
-                routes: [{ name: "Home" }], // <-- make sure 'App' is the registered route name
+                routes: [{ name: "Home" }], 
               });
             } catch (error) {
               console.error("Logout error:", error);

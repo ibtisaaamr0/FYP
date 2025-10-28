@@ -11,7 +11,7 @@ import * as Animatable from "react-native-animatable";
 import LinearGradient from "react-native-linear-gradient";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import AvatarImg from "../avatar.jpeg"; // replace with your avatar image
+import AvatarImg from "../avatar.jpeg"; 
 
 export default function Avatar({ navigation }) {
   return (
