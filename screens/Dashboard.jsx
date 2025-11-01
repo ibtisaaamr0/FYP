@@ -18,7 +18,7 @@ export default function Dashboard({ navigation }) {
     <Animatable.View
       animation="fadeIn"
       duration={1000}
-      style={{ flex: 1, backgroundColor: "#fff" }}
+      style={{ flex: 1, backgroundColor: "#969191ff" }}
     >
       <ScrollView
         style={styles.container}
@@ -54,9 +54,9 @@ export default function Dashboard({ navigation }) {
           <Animatable.View animation="bounceIn" delay={300}>
             <Pressable
               onPress={() => navigation.navigate("Sign")}
-              style={[styles.iconBox, { backgroundColor: "#FFE6E6" }]}
+              style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
             >
-              <FontAwesome5 name="sign-language" size={25} color="#E53935" />
+              <FontAwesome5 name="sign-language" size={25} color="#ffffffff" />
               <Text style={styles.iconText}>Use Sign</Text>
             </Pressable>
           </Animatable.View>
@@ -64,9 +64,9 @@ export default function Dashboard({ navigation }) {
           <Animatable.View animation="bounceIn" delay={500}>
             <Pressable
               onPress={() => navigation.navigate("Voice")}
-              style={[styles.iconBox, { backgroundColor: "#E3F2FD" }]}
+              style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
             >
-              <MaterialIcons name="mic" size={28} color="#1E88E5" />
+              <MaterialIcons name="mic" size={28} color="#fbfbfbff" />
               <Text style={styles.iconText}>Use Voice/Text</Text>
             </Pressable>
           </Animatable.View>
@@ -74,9 +74,9 @@ export default function Dashboard({ navigation }) {
           <Animatable.View animation="bounceIn" delay={700}>
             <Pressable
               onPress={() => navigation.navigate("Quiz")}
-              style={[styles.iconBox, { backgroundColor: "#FFF8E1" }]}
+              style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
             >
-              <MaterialIcons name="quiz" size={28} color="#F9A825" />
+              <MaterialIcons name="quiz" size={28} color="#ffffffff" />
               <Text style={styles.iconText}>Quiz</Text>
             </Pressable>
           </Animatable.View>
@@ -89,7 +89,9 @@ export default function Dashboard({ navigation }) {
           style={styles.sectionHeader}
         >
           <Text style={styles.sectionTitle}>Popular Tools</Text>
+          <Pressable onPress={() => navigation.navigate("SeeAll")}>
           <Text style={styles.viewAll}>See all</Text>
+         </Pressable>
         </Animatable.View>
 
         <ScrollView
@@ -99,7 +101,7 @@ export default function Dashboard({ navigation }) {
         >
           <Animatable.View animation="fadeInLeft" delay={900}>
             <LinearGradient
-              colors={["#FF9A9E", "#FAD0C4"]}
+              colors={["#FF6A3D", "#FF6B6B"]}
               style={[styles.toolCard, { marginLeft: 5 }]}
             >
               <Animatable.View animation="pulse" iterationCount="infinite" duration={3000}>
@@ -111,7 +113,7 @@ export default function Dashboard({ navigation }) {
           </Animatable.View>
 
           <Animatable.View animation="fadeInLeft" delay={1100}>
-            <LinearGradient colors={["#A1C4FD", "#C2E9FB"]} style={styles.toolCard}>
+            <LinearGradient colors={["#FF6A3D", "#FF6B6B"]} style={styles.toolCard}>
               <Animatable.View animation="pulse" iterationCount="infinite" duration={3200}>
                 <MaterialIcons name="textsms" size={40} color="#fff" />
               </Animatable.View>
@@ -121,7 +123,7 @@ export default function Dashboard({ navigation }) {
           </Animatable.View>
 
           <Animatable.View animation="fadeInLeft" delay={1300}>
-            <LinearGradient colors={["#FBC2EB", "#A6C1EE"]} style={styles.toolCard}>
+            <LinearGradient colors={["#af2020ff", "#A6C1EE"]} style={styles.toolCard}>
               <Animatable.View animation="pulse" iterationCount="infinite" duration={3400}>
                 <MaterialIcons name="quiz" size={40} color="#fff" />
               </Animatable.View>
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     fontWeight: "600",
-    color: "#333",
+    color: "#ffffffff",
   },
   sectionHeader: {
     marginTop: 30,
