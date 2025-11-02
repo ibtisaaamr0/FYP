@@ -18,7 +18,7 @@ export default function Dashboard({ navigation }) {
     <Animatable.View
       animation="fadeIn"
       duration={1000}
-      style={{ flex: 1, backgroundColor: "#969191ff" }}
+      style={{ flex: 1, backgroundColor: "#ffffffff" }}
     >
       <ScrollView
         style={styles.container}
@@ -152,7 +152,7 @@ export default function Dashboard({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#d3d3d3ff",
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 13,
-    color: "#777",
+    color: "#000000ff",
     marginTop: 4,
   },
   avatar: {
@@ -211,8 +211,9 @@ const styles = StyleSheet.create({
     color: "#111",
   },
   viewAll: {
-    color: "#888",
+    color: "#000000ff",
     fontSize: 13,
+    fontWeight: "600",
   },
   toolCard: {
     width: 170,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   bottomCard: {
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#ffececff",
     borderRadius: 20,
     padding: 20,
     marginVertical: 30,

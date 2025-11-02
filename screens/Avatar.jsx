@@ -36,7 +36,7 @@ export default function Avatar({ navigation }) {
         delay={200}
         style={styles.avatarCard}
       >
-        <LinearGradient colors={["#A1C4FD", "#C2E9FB"]} style={styles.gradientBox}>
+        <LinearGradient colors={["#FF6A3D", "#FF6B6B"]} style={styles.gradientBox}>
           <Image source={AvatarImg} style={styles.avatarImage} />
         </LinearGradient>
         <Text style={styles.cardTitle}>3D Animated Avatar</Text>
@@ -48,9 +48,9 @@ export default function Avatar({ navigation }) {
         <Animatable.View animation="fadeInUp" delay={400}>
           <Pressable
             onPress={() => alert("Starting Animation...")}
-            style={[styles.iconBox, { backgroundColor: "#FFE6E6" }]}
+            style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
           >
-            <MaterialIcons name="play-circle-fill" size={32} color="#E53935" />
+            <MaterialIcons name="play-circle-fill" size={32} color="#ffffffff" />
             <Text style={styles.iconText}>Start</Text>
           </Pressable>
         </Animatable.View>
@@ -58,9 +58,9 @@ export default function Avatar({ navigation }) {
         <Animatable.View animation="fadeInUp" delay={600}>
           <Pressable
             onPress={() => navigation.navigate("Customize")}
-            style={[styles.iconBox, { backgroundColor: "#E3F2FD" }]}
+            style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
           >
-            <FontAwesome5 name="user-edit" size={26} color="#1E88E5" />
+            <FontAwesome5 name="user-edit" size={26} color="#fdfeffff" />
             <Text style={styles.iconText}>Customize</Text>
           </Pressable>
         </Animatable.View>
@@ -68,9 +68,9 @@ export default function Avatar({ navigation }) {
         <Animatable.View animation="fadeInUp" delay={800}>
           <Pressable
             onPress={() => alert("Avatar Settings")}
-            style={[styles.iconBox, { backgroundColor: "#FFF8E1" }]}
+            style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
           >
-            <MaterialIcons name="settings" size={28} color="#F9A825" />
+            <MaterialIcons name="settings" size={28} color="#fffcf8ff" />
             <Text style={styles.iconText}>Settings</Text>
           </Pressable>
         </Animatable.View>
@@ -90,7 +90,7 @@ export default function Avatar({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FBFF",
+    backgroundColor: "#d3d3d3ff",
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   cardSubtitle: {
     fontSize: 13,
-    color: "#777",
+    color: "#251515ff",
     marginTop: 4,
   },
   iconRow: {
@@ -162,10 +162,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     fontWeight: "600",
-    color: "#333",
+    color: "#ffdbdbff",
   },
   bottomCard: {
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#ffececff",
     borderRadius: 20,
     padding: 20,
     marginVertical: 30,

@@ -1,35 +1,40 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 
-export const loginUser = (email, password) => {
-  return auth().signInWithEmailAndPassword(email, password);
+// ✅ Login
+export const loginUser = async (email, password) => {
+  const firebaseAuth = auth();
+  return firebaseAuth.signInWithEmailAndPassword(email, password);
 };
 
-
-
-
-
+// ✅ Signup
 export const signupUser = async (email, password, name) => {
-  const userCredential = await auth().createUserWithEmailAndPassword(
+  const firebaseAuth = auth();
+
+  const userCredential = await firebaseAuth.createUserWithEmailAndPassword(
     email,
     password
   );
 
   const user = userCredential.user;
-  const userId = user.email;
+  const uid = user.uid; // ✅ Always use UID
 
+  // Set display name
   await user.updateProfile({ displayName: name });
 
-  await firestore().collection("users").doc(userId).set({
+  // Save user info in Firestore
+  await firestore().collection("users").doc(uid).set({
+    uid,
     email,
     name,
-    createdAt: new Date(),
+    createdAt: firestore.FieldValue.serverTimestamp(), // ✅ server timestamp
   });
 
   return userCredential;
 };
 
-
-export const logoutUser = () => {
-  return auth().signOut();
+// ✅ Logout
+export const logoutUser = async () => {
+  const firebaseAuth = auth();
+  return firebaseAuth.signOut();
 };

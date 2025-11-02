@@ -38,11 +38,11 @@ export default function Tabs() {
           } else if (route.name === 'Avatar') {
             iconName = 'person';
             IconComponent = MaterialIcons;
-            activeColor = '#6C63FF'; 
+            activeColor = '#b42f2fff'; 
           } else if (route.name === 'Profile') {
             iconName = 'settings';
             IconComponent = MaterialIcons;
-            activeColor = '#FFD54F'; 
+            activeColor = '#FF6A3D'; 
           }
 
           return (

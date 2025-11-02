@@ -9,6 +9,11 @@ import Tabs from './component/tabs';
 import Login from './screens/login';
 import Signup from './screens/signup';
 import SeeAll from './screens/SeeAll';  
+import AccountInfo from './screens/AccountInfo';
+import Notifications from './screens/Notifications';
+import PrivacySecurity from './screens/Privacy_Security';
+import HelpSupport from './screens/Help_and_SUpport';
+import LogoutScreen from './screens/Logout';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +56,11 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="SeeAll" component={SeeAll} />
+        <Stack.Screen name="AccountInfo" component={AccountInfo}/>
+        <Stack.Screen name="Notification" component={Notifications}/>
+        <Stack.Screen name="Privacy_and_Security" component={PrivacySecurity}/>
+        <Stack.Screen name="Help_and_Support" component={HelpSupport}/>
+        <Stack.Screen name="Logout" component={LogoutScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

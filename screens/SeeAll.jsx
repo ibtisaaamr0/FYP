@@ -30,7 +30,7 @@ export default function ToolsScreen({ navigation }) {
           </Pressable>
 
           <Pressable
-            style={[styles.card, { backgroundColor: "#4F8BF9" }]}
+            style={[styles.card, { backgroundColor: "#FF6A3D" }]}
             onPress={() => navigation.navigate("Voice")}
           >
             <MaterialIcons name="textsms" size={32} color="#fff" />
@@ -38,7 +38,7 @@ export default function ToolsScreen({ navigation }) {
           </Pressable>
 
           <Pressable
-            style={[styles.card, { backgroundColor: "#FFB347" }]}
+            style={[styles.card, { backgroundColor: "#FF6A3D" }]}
             onPress={() => navigation.navigate("Quiz")}
           >
             <MaterialIcons name="quiz" size={32} color="#fff" />

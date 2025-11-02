@@ -51,28 +51,28 @@ export default function Profile() {
       label: "Account Information",
       bgColor: "#E3F2FD",
       iconColor: "#1E88E5",
-      action: () => Alert.alert("Account Information", "Coming soon..."),
+      action:() => navigation.navigate("AccountInfo"),
     },
     {
       icon: "notifications",
       label: "Notifications",
       bgColor: "#FFF8E1",
       iconColor: "#F9A825",
-      action: () => Alert.alert("Notifications", "Coming soon..."),
+      action: () => navigation.navigate("Notification"),
     },
     {
       icon: "security",
       label: "Privacy & Security",
       bgColor: "#E8F5E9",
       iconColor: "#43A047",
-      action: () => Alert.alert("Privacy & Security", "Coming soon..."),
+      action: () => navigation.navigate("Privacy_and_Security"),
     },
     {
       icon: "help-outline",
       label: "Help & Support",
       bgColor: "#FCE4EC",
       iconColor: "#E91E63",
-      action: () => Alert.alert("Help & Support", "Coming soon..."),
+      action: () => navigation.navigate("Help_and_Support"),
     },
     {
       icon: "logout",
@@ -121,7 +121,7 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FBFF",
+    backgroundColor: "#d3d3d3ff",
     paddingHorizontal: 20,
     paddingTop: 50,
   },
