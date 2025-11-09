@@ -1,77 +1,64 @@
 import React, { useState } from "react";
 import {
   View,
-  StyleSheet,
   Text,
   TextInput,
   Pressable,
   Alert,
-  Image,
+  StyleSheet,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import * as Animatable from "react-native-animatable";
-import { signupUser } from "../component/auth";
+import auth from "@react-native-firebase/auth";
 import Logo from "../logo.png";
 
-export default function Signup({ navigation }) {
+export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
 
-  const handleSignup = async () => {
+  const handleResetPassword = async () => {
+    if (!email.trim()) {
+      Alert.alert("Error", "Please enter your email address.");
+      return;
+    }
+
     try {
-      if (!email || !password || !name) {
-        Alert.alert("Error", "Please fill in all fields.");
-        return;
-      }
-
-      await signupUser(email, password, name);
-      Alert.alert("Success", "Account created!");
-      navigation.navigate("Login");
+      await auth().sendPasswordResetEmail(email);
+      Alert.alert(
+        "Email Sent",
+        "Check your inbox for password reset instructions."
+      );
+      navigation.goBack();
     } catch (error) {
-      Alert.alert("Signup Error", error.message);
+      console.log(error);
+      if (error.code === "auth/invalid-email") {
+        Alert.alert("Invalid Email", "Please enter a valid email address.");
+      } else if (error.code === "auth/user-not-found") {
+        Alert.alert("User Not Found", "No user exists with this email.");
+      } else {
+        Alert.alert("Error", "Something went wrong. Try again later.");
+      }
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <LinearGradient colors={["#b42f2f", "#FF6A3D"]} style={styles.header}>
         <Animatable.Image
           animation="zoomIn"
           duration={800}
-          delay={200}
           source={Logo}
           style={styles.logo}
         />
-        <Animatable.Text
-          animation="fadeInDown"
-          delay={400}
-          style={styles.title}
-        >
-          Silent Voice
+        <Animatable.Text animation="fadeInDown" delay={400} style={styles.title}>
+          Reset Password
         </Animatable.Text>
       </LinearGradient>
 
-      {/* Bottom Section */}
-      <Animatable.View
-        animation="fadeInUp"
-        delay={500}
-        style={styles.bottomCard}
-      >
-        <Text style={styles.heading}>Create Account ✨</Text>
+      <Animatable.View animation="fadeInUp" delay={500} style={styles.bottomCard}>
+        <Text style={styles.heading}>Forgot Your Password?</Text>
         <Text style={styles.subtext}>
-          Join the Silent Voice community today
+          Enter your registered email address to receive reset instructions.
         </Text>
-
-        <Text style={styles.label}>Name</Text>
-        <TextInput
-          placeholder="Enter your name"
-          placeholderTextColor="#888"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-        />
 
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -84,32 +71,17 @@ export default function Signup({ navigation }) {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          placeholder="Enter your password"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-        />
-
-        <Pressable style={styles.button} onPress={handleSignup}>
+        <Pressable style={styles.button} onPress={handleResetPassword}>
           <LinearGradient
             colors={["#FF6A3D", "#b42f2f"]}
             style={styles.gradientButton}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>Send Reset Link</Text>
           </LinearGradient>
         </Pressable>
 
-        <Text style={styles.loginText}>Already have an account?</Text>
-
-        <Pressable
-          style={styles.loginButton}
-          onPress={() => navigation.navigate("Login")}
-        >
-          <Text style={styles.loginButtonText}>Back to Login</Text>
+        <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 15 }}>
+          <Text style={{ color: "#b42f2f", textAlign: "center" }}>Back to Login</Text>
         </Pressable>
       </Animatable.View>
     </View>
@@ -129,13 +101,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 50,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     borderRadius: 25,
     marginBottom: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     color: "#fff",
     fontWeight: "700",
   },
@@ -149,7 +121,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
     color: "#b42f2f",
     textAlign: "center",
@@ -185,23 +157,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
-  },
-  loginText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#444",
-  },
-  loginButton: {
-    marginTop: 12,
-    backgroundColor: "#fff",
-    borderWidth: 1.5,
-    borderColor: "#b42f2f",
-    borderRadius: 20,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  loginButtonText: {
-    color: "#b42f2f",
-    fontWeight: "700",
   },
 });
