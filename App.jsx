@@ -13,7 +13,7 @@ import AccountInfo from './screens/AccountInfo';
 import Notifications from './screens/Notifications';
 import PrivacySecurity from './screens/Privacy_Security';
 import HelpSupport from './screens/Help_and_SUpport';
-import LogoutScreen from './screens/Logout';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -60,7 +60,6 @@ export default function App() {
         <Stack.Screen name="Notification" component={Notifications}/>
         <Stack.Screen name="Privacy_and_Security" component={PrivacySecurity}/>
         <Stack.Screen name="Help_and_Support" component={HelpSupport}/>
-        <Stack.Screen name="Logout" component={LogoutScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
