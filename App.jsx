@@ -11,9 +11,9 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import Logo from "../silentvoice/logo.png";
-import Bg from "../silentvoice/bg.jpeg";
-import Bg1 from "../silentvoice/bg1.jpeg";
+import Logo from "./logo.png";
+import Bg from "./bg.jpeg";
+import Bg1 from "./bg1.jpeg";
 import Tabs from "./component/tabs";
 import Login from "./screens/login";
 import Signup from "./screens/signup";
