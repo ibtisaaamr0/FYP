@@ -63,7 +63,7 @@ export default function Dashboard({ navigation }) {
 
           <Animatable.View animation="bounceIn" delay={500}>
             <Pressable
-              onPress={() => navigation.navigate("Voice")}
+              onPress={() => navigation.navigate("VoiceToText")}
               style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
             >
               <MaterialIcons name="mic" size={28} color="#fbfbfbff" />

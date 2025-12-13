@@ -23,6 +23,7 @@ import Notifications from "./screens/Notifications";
 import PrivacySecurity from "./screens/Privacy_Security";
 import HelpSupport from "./screens/Help_and_SUpport";
 import ForgotPassword from "./screens/ForgotPass";
+import VoiceToText from "./screens/VoiceToText";
 
 const Stack = createNativeStackNavigator();
 
@@ -70,6 +71,16 @@ function HomeScreen({ navigation }) {
             Off to main menu
           </Text>
         </Pressable>
+
+        {/* 🎙️ Voice to Text Button */}
+        <Pressable
+          style={[styles.button, { backgroundColor: button, marginTop: 20 }]}
+          onPress={() => navigation.navigate("VoiceToText")}
+        >
+          <Text style={[styles.buttonText, { color: ButtonTextColor }]}>
+            Voice to Text
+          </Text>
+        </Pressable>
       </View>
     </ImageBackground>
   );
@@ -92,6 +103,7 @@ export default function App() {
           component={PrivacySecurity}
         />
         <Stack.Screen name="Help_and_Support" component={HelpSupport} />
+        <Stack.Screen name="VoiceToText" component={VoiceToText} />
       </Stack.Navigator>
     </NavigationContainer>
   );
