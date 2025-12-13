@@ -8,6 +8,9 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Dashboard from '../screens/Dashboard';
 import Avatar from '../screens/Avatar';
 import Profile from '../screens/Profile';
+import Sign from '../screens/Sign';
+import Voice from '../screens/Voice';
+import Quiz from '../screens/Quiz';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -16,6 +19,9 @@ function DashboardStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DashboardMain" component={Dashboard} />
+      <Stack.Screen name="Sign" component={Sign} />
+      <Stack.Screen name="Voice" component={Voice} />
+      <Stack.Screen name="Quiz" component={Quiz} />
     </Stack.Navigator>
   );
 }
