@@ -78,7 +78,7 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
  android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-    ndkVersion "29.0.14206865"
+    ndkVersion rootProject.ext.ndkVersion
     namespace "com.silentvoice"
 
     defaultConfig {

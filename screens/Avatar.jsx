@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,14 +6,46 @@ import {
   Image,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import LinearGradient from "react-native-linear-gradient";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AvatarImg from "../avatar.jpeg"; 
+import AvatarView from "../component/AvatarView";
 
 export default function Avatar({ navigation }) {
+  const [currentGesture, setCurrentGesture] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [recognizedText, setRecognizedText] = useState("");
+
+  const startListening = async () => {
+    setIsListening(true);
+    setRecognizedText("Listening...");
+    try {
+      // Call our backend listen endpoint
+      const response = await fetch("http://10.0.2.2:5000/listen?duration=3");
+      const data = await response.json();
+      console.log("Speech Result:", data);
+      
+      setRecognizedText(data.text);
+      
+      // Map text to gesture
+      const text = data.text.toLowerCase();
+      if (text.includes("hello")) setCurrentGesture("hello");
+      else if (text.includes("thumb")) setCurrentGesture("thumb_up");
+      else if (text.includes("fist")) setCurrentGesture("fist");
+      else setCurrentGesture("default");
+
+    } catch (error) {
+      console.error("Speech Error:", error);
+      setRecognizedText("Error connecting to server");
+    } finally {
+      setIsListening(false);
+    }
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -37,21 +69,28 @@ export default function Avatar({ navigation }) {
         style={styles.avatarCard}
       >
         <LinearGradient colors={["#FF6A3D", "#FF6B6B"]} style={styles.gradientBox}>
-          <Image source={AvatarImg} style={styles.avatarImage} />
+          <AvatarView currentAnimation={currentGesture} />
         </LinearGradient>
         <Text style={styles.cardTitle}>3D Animated Avatar</Text>
-        <Text style={styles.cardSubtitle}>Your digital communication partner</Text>
+        <Text style={recognizedText ? styles.recognizedText : styles.cardSubtitle}>
+          {recognizedText || "Your digital communication partner"}
+        </Text>
       </Animatable.View>
 
       {/* Action Buttons */}
       <View style={styles.iconRow}>
         <Animatable.View animation="fadeInUp" delay={400}>
           <Pressable
-            onPress={() => alert("Starting Animation...")}
-            style={[styles.iconBox, { backgroundColor: "#b42f2fff" }]}
+            onPress={startListening}
+            disabled={isListening}
+            style={[styles.iconBox, { backgroundColor: isListening ? "#666" : "#b42f2fff" }]}
           >
-            <MaterialIcons name="play-circle-fill" size={32} color="#ffffffff" />
-            <Text style={styles.iconText}>Start</Text>
+            {isListening ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <MaterialIcons name="mic" size={32} color="#ffffffff" />
+            )}
+            <Text style={styles.iconText}>{isListening ? "Listening" : "Speak"}</Text>
           </Pressable>
         </Animatable.View>
 
@@ -140,6 +179,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 15,
     color: "#012d58",
+  },
+  recognizedText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FF6A3D",
+    marginTop: 4,
   },
   cardSubtitle: {
     fontSize: 13,
