@@ -12,48 +12,58 @@ import * as Animatable from "react-native-animatable";
 import Logo from "../logo.png";
 import { loginUser } from "../component/auth";
 
+
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
     try {
       await loginUser(email, password);
-      Alert.alert("Success", "Logged in successfully!");
+
       navigation.navigate("Tabs");
     } catch (error) {
       Alert.alert("Login Error", error.message);
     }
   };
 
+  // Check if both fields are filled
+  const isFilled = email.trim() !== "" && password.trim() !== "";
+
   return (
     <View style={styles.container}>
-      {/* Top Section */}
-      <LinearGradient colors={["#012d58", "#3b658f"]} style={styles.top}>
+      {/* Header */}
+      <LinearGradient colors={["#b42f2f", "#FF6A3D"]} style={styles.header}>
         <Animatable.Image
+          animation="zoomIn"
+          duration={800}
+          delay={200}
           source={Logo}
           style={styles.logo}
-          animation="fadeInDown"
-          delay={800}
-          duration={600}
         />
         <Animatable.Text
-          style={styles.text}
           animation="fadeInDown"
-          delay={800}
-          duration={600}
+          delay={400}
+          style={styles.title}
         >
           Silent Voice
         </Animatable.Text>
       </LinearGradient>
 
-      {/* White Rounded Section */}
-      <View style={styles.bottomBox}>
-        <Text style={styles.heading}>Log In</Text>
+      {/* Bottom Section */}
+      <Animatable.View animation="fadeInUp" delay={500} style={styles.bottomCard}>
+        <Text style={styles.heading}>Welcome Back 👋</Text>
+        <Text style={styles.subtext}>Log in to continue your journey</Text>
 
-        <Text style={styles.label}>EMAIL</Text>
+        <Text style={styles.label}>Email</Text>
         <TextInput
-          placeholder="Enter email"
+          placeholder="Enter your email"
+          placeholderTextColor="#888"
           value={email}
           onChangeText={setEmail}
           style={styles.input}
@@ -61,81 +71,140 @@ export default function Login({ navigation }) {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>PASSWORD</Text>
+        <Text style={styles.label}>Password</Text>
         <TextInput
-          placeholder="Enter password"
+          placeholder="Enter your password"
+          placeholderTextColor="#888"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           style={styles.input}
         />
 
-        <Pressable style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Log In</Text>
+        {/* LOGIN BUTTON */}
+        <Pressable
+          style={[styles.button, { opacity: isFilled ? 1 : 0.6 }]}
+          onPress={handleLogin}
+          disabled={!isFilled}
+        >
+          <LinearGradient
+            colors={
+              isFilled
+                ? ["#FF6A3D", "#b42f2f"] // active colors
+                : ["#ffb5a0", "#d28c8c"] // lighter shade when inactive
+            }
+            style={styles.gradientButton}
+          >
+            <Text style={styles.buttonText}>Log In</Text>
+          </LinearGradient>
+          <Pressable
+            onPress={() => navigation.navigate("ForgotPass")}
+            style={{ marginTop: 5, marginBottom: 10 , display:"flex"  , alignItems:"center",  justifyContent:"center"}}
+          >
+            <Text style={{ color: "#b42f2f", fontWeight: "600" }}>Forgot Password?</Text>
+          </Pressable>
+
         </Pressable>
 
-        <Text style={{ marginTop: 10, textAlign: "center" }}>
-          If you don’t have an account then
-        </Text>
+        <Text style={styles.signupText}>Don't have an account?</Text>
 
         <Pressable
-          style={[styles.button, { backgroundColor: "#012d58" }]}
+          style={styles.signupButton}
           onPress={() => navigation.navigate("Signup")}
         >
-          <Text style={styles.buttonText}>Sign up</Text>
+          <Text style={styles.signupButtonText}>Sign Up</Text>
         </Pressable>
-      </View>
+      </Animatable.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#bbb" },
-
-  top: {
-    paddingVertical: 40,
+  container: {
+    flex: 1,
+    backgroundColor: "#ffececff",
+  },
+  header: {
+    height: "40%",
     alignItems: "center",
     justifyContent: "center",
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
-
-  logo: { width: 70, height: 80, marginBottom: 5 },
-
-  text: { fontSize: 22, fontWeight: "bold", color: "white" },
-
-  bottomBox: {
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 24,
+    color: "#fff",
+    fontWeight: "700",
+  },
+  bottomCard: {
     flex: 1,
     backgroundColor: "#fff",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    marginTop: -40,
     padding: 25,
-    marginTop: -30, // lifts the white box up a little
-    elevation: 5,
+    elevation: 8,
   },
-
   heading: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: "#b42f2f",
     textAlign: "center",
-    marginBottom: 15,
-    color: "#012d58",
   },
-
-  label: { marginTop: 10, fontWeight: "bold", color: "#333" },
-
+  subtext: {
+    fontSize: 13,
+    color: "#777",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  label: {
+    fontWeight: "600",
+    color: "#333",
+    marginTop: 10,
+  },
   input: {
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 5,
-  },
-
-  button: {
-    backgroundColor: "#3b658f",
-    borderRadius: 20,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 15,
     padding: 12,
+    marginTop: 8,
+  },
+  button: {
+    marginTop: 25,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  gradientButton: {
+    paddingVertical: 14,
+    alignItems: "center",
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  signupText: {
+    textAlign: "center",
     marginTop: 20,
+    color: "#444",
+  },
+  signupButton: {
+    marginTop: 12,
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#b42f2f",
+    borderRadius: 20,
+    paddingVertical: 12,
     alignItems: "center",
   },
-
-  buttonText: { color: "white", fontWeight: "bold" },
+  signupButtonText: {
+    color: "#b42f2f",
+    fontWeight: "700",
+  },
 });

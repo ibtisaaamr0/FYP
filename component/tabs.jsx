@@ -1,14 +1,16 @@
 import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import Dashboard from '../screens/Dashboard';
 import Avatar from '../screens/Avatar';
 import Profile from '../screens/Profile';
-
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import LinearGradient from 'react-native-linear-gradient';
+import Sign from '../screens/Sign';
+import Voice from '../screens/Voice';
+import Quiz from '../screens/Quiz';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -17,58 +19,85 @@ function DashboardStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DashboardMain" component={Dashboard} />
+      <Stack.Screen name="Sign" component={Sign} />
+      <Stack.Screen name="Voice" component={Voice} />
+      <Stack.Screen name="Quiz" component={Quiz} />
     </Stack.Navigator>
   );
 }
 
-
-
 export default function Tabs() {
   return (
-    
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor:"transparent", height: 60 },
-        tabBarActiveTintColor: 'white',
-        tabBarInactiveTintColor: 'lightgray',
-        tabBarBackground: () => (
-        <LinearGradient
-        colors={["#003973", "#1f7567ff"]} // gradient colors
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ flex: 1 ,height: 60}}
-      />
-        )
-      }}
+        tabBarShowLabel: false,
+        tabBarStyle: styles.tabBar,
+        tabBarIcon: ({ focused, size }) => {
+          let iconName;
+          let IconComponent = FontAwesome5;
+          let activeColor = '#FF6B35';
+          let inactiveColor = '#A9A9A9'; 
+
+          if (route.name === 'Dashboard') {
+            iconName = 'home';
+          } else if (route.name === 'Avatar') {
+            iconName = 'person';
+            IconComponent = MaterialIcons;
+            activeColor = '#b42f2fff'; 
+          } else if (route.name === 'Profile') {
+            iconName = 'settings';
+            IconComponent = MaterialIcons;
+            activeColor = '#FF6A3D'; 
+          }
+
+          return (
+            <View style={styles.iconContainer}>
+              <IconComponent
+                name={iconName}
+                size={focused ? size + 4 : size}
+                color={focused ? activeColor : inactiveColor}
+              />
+              {focused && <View style={[styles.indicator, { backgroundColor: activeColor }]} />}
+            </View>
+          );
+        },
+      })}
     >
-      <Tab.Screen
-        name="Dashboard"
-        component={DashboardStack}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Avatar"
-        component={Avatar}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="person" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="settings" size={size} color={color} />
-          ),
-        }}
-      />
+      <Tab.Screen name="Dashboard" component={DashboardStack} />
+      <Tab.Screen name="Avatar" component={Avatar} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+
+    height: 65,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
+    borderTopWidth: 0,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+
+    shadowOffset: { width: 0, height: 4 },
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  indicator: {
+    
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 4,
+  },
+});
