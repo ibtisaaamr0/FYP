@@ -1,207 +1,122 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TextInput,
-  Pressable,
-  Alert,
-  Image,
+import { 
+  View, 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  Pressable, 
+  Alert, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  Image 
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUser } from "../Redux/features/authSlice";
 import LinearGradient from "react-native-linear-gradient";
-import * as Animatable from "react-native-animatable";
-import { signupUser } from "../component/auth";
-import Logo from "../logo.png";
+import * as ImagePicker from 'react-native-image-picker'; // ✅ Ensure this is installed
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [profileImage, setProfileImage] = useState(null); // Local state for the image
+
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.auth);
+
+  // --- IMAGE PICKER LOGIC ---
+  const handlePickImage = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 300,
+      maxWidth: 300,
+    };
+
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.assets && response.assets.length > 0) {
+        setProfileImage(response.assets[0].uri);
+      }
+    });
+  };
 
   const handleSignup = async () => {
-    try {
-      if (!email || !password || !name) {
-        Alert.alert("Error", "Please fill in all fields.");
-        return;
-      }
+    if (!email || !password || !name) {
+      Alert.alert("Error", "All fields are required!");
+      return;
+    }
 
-      await signupUser(email, password, name);
-      Alert.alert("Success", "Account created!");
-      navigation.navigate("Login");
-    } catch (error) {
-      Alert.alert("Signup Error", error.message);
+    // Pass the image URI to the thunk along with other details
+    const result = await dispatch(signupUser({ 
+      email, 
+      password, 
+      name, 
+      profilePicture: profileImage // Now optional
+    }));
+
+    if (signupUser.fulfilled.match(result)) {
+      Alert.alert("Success", `Welcome ${name}!`);
+      navigation.navigate("Tabs"); 
+    } else {
+      Alert.alert("Error", result.payload);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={["#b42f2f", "#FF6A3D"]} style={styles.header}>
-        <Animatable.Image
-          animation="zoomIn"
-          duration={800}
-          delay={200}
-          source={Logo}
-          style={styles.logo}
-        />
-        <Animatable.Text
-          animation="fadeInDown"
-          delay={400}
-          style={styles.title}
-        >
-          Silent Voice
-        </Animatable.Text>
-      </LinearGradient>
+      <Text style={styles.title}>Create Account</Text>
 
-      {/* Bottom Section */}
-      <Animatable.View
-        animation="fadeInUp"
-        delay={500}
-        style={styles.bottomCard}
-      >
-        <Text style={styles.heading}>Create Account ✨</Text>
-        <Text style={styles.subtext}>
-          Join the Silent Voice community today
-        </Text>
+      {/* --- PROFILE PICTURE UPLOAD AREA --- */}
+      <TouchableOpacity style={styles.imagePickerContainer} onPress={handlePickImage}>
+        {profileImage ? (
+          <Image source={{ uri: profileImage }} style={styles.previewImage} />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <MaterialIcons name="add-a-photo" size={30} color="#888" />
+            <Text style={styles.imagePlaceholderText}>Add Photo (Optional)</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+      
+      <TextInput placeholder="Full Name" style={styles.input} value={name} onChangeText={setName} />
+      <TextInput placeholder="Email" style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" />
+      <TextInput placeholder="Password" style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
 
-        <Text style={styles.label}>Name</Text>
-        <TextInput
-          placeholder="Enter your name"
-          placeholderTextColor="#888"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-        />
-
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          placeholder="Enter your email"
-          placeholderTextColor="#888"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          placeholder="Enter your password"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-        />
-
-        <Pressable style={styles.button} onPress={handleSignup}>
-          <LinearGradient
-            colors={["#FF6A3D", "#b42f2f"]}
-            style={styles.gradientButton}
-          >
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </LinearGradient>
-        </Pressable>
-
-        <Text style={styles.loginText}>Already have an account?</Text>
-
-        <Pressable
-          style={styles.loginButton}
-          onPress={() => navigation.navigate("Login")}
-        >
-          <Text style={styles.loginButtonText}>Back to Login</Text>
-        </Pressable>
-      </Animatable.View>
+      <Pressable onPress={handleSignup} disabled={isLoading} style={styles.btnContainer}>
+        <LinearGradient colors={["#FF6A3D", "#b42f2f"]} style={styles.button}>
+          {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Sign Up</Text>}
+        </LinearGradient>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffececff",
-  },
-  header: {
-    height: "40%",
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
-  },
-  logo: {
+  container: { flex: 1, padding: 30, justifyContent: 'center', backgroundColor: '#fff' },
+  title: { fontSize: 28, fontWeight: 'bold', color: '#b42f2f', marginBottom: 20, textAlign: 'center' },
+  
+  // --- NEW IMAGE PICKER STYLES ---
+  imagePickerContainer: {
+    alignSelf: 'center',
     width: 100,
     height: 100,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    color: "#fff",
-    fontWeight: "700",
-  },
-  bottomCard: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    marginTop: -40,
-    padding: 25,
-    elevation: 8,
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#b42f2f",
-    textAlign: "center",
-  },
-  subtext: {
-    fontSize: 13,
-    color: "#777",
-    textAlign: "center",
+    borderRadius: 50,
+    backgroundColor: '#f0f0f0',
     marginBottom: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderStyle: 'dashed',
   },
-  label: {
-    fontWeight: "600",
-    color: "#333",
-    marginTop: 10,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 15,
-    padding: 12,
-    marginTop: 8,
-  },
-  button: {
-    marginTop: 25,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  gradientButton: {
-    paddingVertical: 14,
-    alignItems: "center",
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  loginText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#444",
-  },
-  loginButton: {
-    marginTop: 12,
-    backgroundColor: "#fff",
-    borderWidth: 1.5,
-    borderColor: "#b42f2f",
-    borderRadius: 20,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  loginButtonText: {
-    color: "#b42f2f",
-    fontWeight: "700",
-  },
+  previewImage: { width: '100%', height: '100%' },
+  imagePlaceholder: { alignItems: 'center' },
+  imagePlaceholderText: { fontSize: 10, color: '#888', marginTop: 5 },
+
+  input: { backgroundColor: '#f5f5f5', borderRadius: 10, padding: 15, marginBottom: 15 },
+  btnContainer: { marginTop: 10, borderRadius: 10, overflow: 'hidden' },
+  button: { padding: 15, alignItems: 'center' },
+  btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
 });

@@ -6,16 +6,23 @@ import {
   Text,
   Pressable,
   Alert,
+  ActivityIndicator, // Added for loading feedback
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import Logo from "../logo.png";
-import { loginUser } from "../component/auth";
 
+// REDUX IMPORTS
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../Redux/features/authSlice";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Redux Hooks
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.auth);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -23,21 +30,22 @@ export default function Login({ navigation }) {
       return;
     }
 
-    try {
-      await loginUser(email, password);
+    // Dispatch the loginUser thunk
+    const resultAction = await dispatch(loginUser({ email, password }));
 
+    if (loginUser.fulfilled.match(resultAction)) {
+      // Success: Navigate to Tabs
       navigation.navigate("Tabs");
-    } catch (error) {
-      Alert.alert("Login Error", error.message);
+    } else {
+      // Error: Show the error message from Redux
+      Alert.alert("Login Error", resultAction.payload || "Something went wrong");
     }
   };
 
-  // Check if both fields are filled
-  const isFilled = email.trim() !== "" && password.trim() !== "";
+  const isFilled = email.trim() !== "" && password.trim() !== "" && !isLoading;
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <LinearGradient colors={["#b42f2f", "#FF6A3D"]} style={styles.header}>
         <Animatable.Image
           animation="zoomIn"
@@ -46,16 +54,11 @@ export default function Login({ navigation }) {
           source={Logo}
           style={styles.logo}
         />
-        <Animatable.Text
-          animation="fadeInDown"
-          delay={400}
-          style={styles.title}
-        >
+        <Animatable.Text animation="fadeInDown" delay={400} style={styles.title}>
           Silent Voice
         </Animatable.Text>
       </LinearGradient>
 
-      {/* Bottom Section */}
       <Animatable.View animation="fadeInUp" delay={500} style={styles.bottomCard}>
         <Text style={styles.heading}>Welcome Back 👋</Text>
         <Text style={styles.subtext}>Log in to continue your journey</Text>
@@ -69,6 +72,7 @@ export default function Login({ navigation }) {
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!isLoading} // Disable input while loading
         />
 
         <Text style={styles.label}>Password</Text>
@@ -79,31 +83,31 @@ export default function Login({ navigation }) {
           value={password}
           onChangeText={setPassword}
           style={styles.input}
+          editable={!isLoading} // Disable input while loading
         />
 
-        {/* LOGIN BUTTON */}
         <Pressable
           style={[styles.button, { opacity: isFilled ? 1 : 0.6 }]}
           onPress={handleLogin}
           disabled={!isFilled}
         >
           <LinearGradient
-            colors={
-              isFilled
-                ? ["#FF6A3D", "#b42f2f"] // active colors
-                : ["#ffb5a0", "#d28c8c"] // lighter shade when inactive
-            }
+            colors={isFilled ? ["#FF6A3D", "#b42f2f"] : ["#ffb5a0", "#d28c8c"]}
             style={styles.gradientButton}
           >
-            <Text style={styles.buttonText}>Log In</Text>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Log In</Text>
+            )}
           </LinearGradient>
-          <Pressable
-            onPress={() => navigation.navigate("ForgotPass")}
-            style={{ marginTop: 5, marginBottom: 10 , display:"flex"  , alignItems:"center",  justifyContent:"center"}}
-          >
-            <Text style={{ color: "#b42f2f", fontWeight: "600" }}>Forgot Password?</Text>
-          </Pressable>
+        </Pressable>
 
+        <Pressable
+          onPress={() => navigation.navigate("ForgotPass")}
+          style={styles.forgotPassContainer}
+        >
+          <Text style={styles.forgotPassText}>Forgot Password?</Text>
         </Pressable>
 
         <Text style={styles.signupText}>Don't have an account?</Text>
@@ -111,6 +115,7 @@ export default function Login({ navigation }) {
         <Pressable
           style={styles.signupButton}
           onPress={() => navigation.navigate("Signup")}
+          disabled={isLoading}
         >
           <Text style={styles.signupButtonText}>Sign Up</Text>
         </Pressable>
@@ -120,10 +125,7 @@ export default function Login({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffececff",
-  },
+  container: { flex: 1, backgroundColor: "#ffececff" },
   header: {
     height: "40%",
     alignItems: "center",
@@ -131,17 +133,8 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 50,
     borderBottomRightRadius: 50,
   },
-  logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    color: "#fff",
-    fontWeight: "700",
-  },
+  logo: { width: 100, height: 100, borderRadius: 25, marginBottom: 10 },
+  title: { fontSize: 24, color: "#fff", fontWeight: "700" },
   bottomCard: {
     flex: 1,
     backgroundColor: "#fff",
@@ -151,49 +144,16 @@ const styles = StyleSheet.create({
     padding: 25,
     elevation: 8,
   },
-  heading: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#b42f2f",
-    textAlign: "center",
-  },
-  subtext: {
-    fontSize: 13,
-    color: "#777",
-    textAlign: "center",
-    marginBottom: 25,
-  },
-  label: {
-    fontWeight: "600",
-    color: "#333",
-    marginTop: 10,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 15,
-    padding: 12,
-    marginTop: 8,
-  },
-  button: {
-    marginTop: 25,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  gradientButton: {
-    paddingVertical: 14,
-    alignItems: "center",
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  signupText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#444",
-  },
+  heading: { fontSize: 22, fontWeight: "700", color: "#b42f2f", textAlign: "center" },
+  subtext: { fontSize: 13, color: "#777", textAlign: "center", marginBottom: 25 },
+  label: { fontWeight: "600", color: "#333", marginTop: 10 },
+  input: { backgroundColor: "#f5f5f5", borderRadius: 15, padding: 12, marginTop: 8 },
+  button: { marginTop: 25, borderRadius: 20, overflow: "hidden" },
+  gradientButton: { paddingVertical: 14, alignItems: "center", borderRadius: 20 },
+  buttonText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  forgotPassContainer: { marginTop: 15, alignItems: "center" },
+  forgotPassText: { color: "#b42f2f", fontWeight: "600" },
+  signupText: { textAlign: "center", marginTop: 20, color: "#444" },
   signupButton: {
     marginTop: 12,
     backgroundColor: "#fff",
@@ -203,8 +163,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
-  signupButtonText: {
-    color: "#b42f2f",
-    fontWeight: "700",
-  },
+  signupButtonText: { color: "#b42f2f", fontWeight: "700" },
 });
