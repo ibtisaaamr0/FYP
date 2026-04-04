@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
+// REDUX IMPORT
+import { useSelector } from 'react-redux';
 
 import Dashboard from '../screens/Dashboard';
 import Avatar from '../screens/Avatar';
@@ -27,38 +30,57 @@ function DashboardStack() {
 }
 
 export default function Tabs() {
+  // 1. Pull theme from Redux
+  const isDarkMode = useSelector((state) => state.theme?.isDarkMode);
+
+  // 2. Modern Theme Palette
+  const theme = {
+    bg: isDarkMode ? "#1E293B" : "#FFFFFF", // Deep slate vs pure white
+    active: isDarkMode ? "#6366F1" : "#6366F1", // Unified modern Indigo
+    inactive: isDarkMode ? "#64748B" : "#94A3B8",
+    shadow: isDarkMode ? "#000" : "#6366F1",
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar, 
+          { 
+            backgroundColor: theme.bg,
+            shadowColor: theme.shadow,
+            // Adjust position for Android/iOS
+            bottom: Platform.OS === 'ios' ? 30 : 20 
+          }
+        ],
         tabBarIcon: ({ focused, size }) => {
           let iconName;
           let IconComponent = FontAwesome5;
-          let activeColor = '#FF6B35';
-          let inactiveColor = '#A9A9A9'; 
 
           if (route.name === 'Dashboard') {
             iconName = 'home';
           } else if (route.name === 'Avatar') {
             iconName = 'person';
             IconComponent = MaterialIcons;
-            activeColor = '#b42f2fff'; 
           } else if (route.name === 'Profile') {
             iconName = 'settings';
             IconComponent = MaterialIcons;
-            activeColor = '#FF6A3D'; 
           }
 
           return (
             <View style={styles.iconContainer}>
               <IconComponent
                 name={iconName}
-                size={focused ? size + 4 : size}
-                color={focused ? activeColor : inactiveColor}
+                size={focused ? 26 : 22} // Subtle size difference
+                color={focused ? theme.active : theme.inactive}
               />
-              {focused && <View style={[styles.indicator, { backgroundColor: activeColor }]} />}
+              {focused && (
+                <View 
+                  style={[styles.indicator, { backgroundColor: theme.active }]} 
+                />
+              )}
             </View>
           );
         },
@@ -74,30 +96,32 @@ export default function Tabs() {
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-
-    height: 65,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    borderTopWidth: 0,
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-
-    shadowOffset: { width: 0, height: 4 },
+    left: 25,
+    right: 25,
+    height: 70,
+    borderRadius: 30,
+    borderTopWidth: 0, // Removes the standard line
+    
+    // Modern "Floating" Shadow
+    elevation: 10,
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    top: Platform.OS === 'ios' ? 15 : 0, // Centers icons better
   },
   indicator: {
-    
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 4,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    marginTop: 6,
+    // Add a small glow effect to the dot
+    shadowColor: '#6366F1',
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });
