@@ -1,34 +1,33 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { auth, db } from '../../backend/firebaseConfig'; 
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  updateProfile, 
-  signOut 
-} from 'firebase/auth';
-import { setDoc, doc, getDoc } from 'firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 // --- SIGNUP THUNK ---
 export const signupUser = createAsyncThunk(
   'auth/signupUser',
   async ({ email, password, name, profilePicture }, thunkAPI) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
 
-      // Update Auth Profile (Internal Firebase Name)
-      await updateProfile(user, { displayName: name });
+      // Update Auth Profile
+      await user.updateProfile({
+        displayName: name,
+      });
 
-      // Save to Firestore (Including the optional profile picture)
+      // Save to Firestore
       const userData = {
         uid: user.uid,
         name: name,
         email: email,
-        profilePicture: profilePicture || null, // Stores URI string or null
+        profilePicture: profilePicture || null,
         createdAt: new Date().toISOString(),
       };
-      
-      await setDoc(doc(db, "users", user.uid), userData);
+
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .set(userData);
 
       return userData;
     } catch (error) {
@@ -42,22 +41,22 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, thunkAPI) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
       const user = userCredential.user;
 
-      // Fetch full profile (name, email, AND profilePicture) from Firestore
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
+      const docSnap = await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
-      if (docSnap.exists()) {
-        return docSnap.data(); // This now returns the object with profilePicture
+      if (docSnap.exists) {
+        return docSnap.data();
       } else {
-        // Fallback if Firestore doc is missing
-        return { 
-          uid: user.uid, 
-          email: user.email, 
+        return {
+          uid: user.uid,
+          email: user.email,
           name: user.displayName,
-          profilePicture: null 
+          profilePicture: null,
         };
       }
     } catch (error) {
@@ -71,14 +70,17 @@ const authSlice = createSlice({
   initialState: { user: null, isLoading: false, error: null },
   reducers: {
     logout: (state) => {
-      signOut(auth);
+      auth().signOut();
       state.user = null;
     }
   },
   extraReducers: (builder) => {
     builder
       // Signup
-      .addCase(signupUser.pending, (state) => { state.isLoading = true; state.error = null; })
+      .addCase(signupUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(signupUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
@@ -87,8 +89,12 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+
       // Login
-      .addCase(loginUser.pending, (state) => { state.isLoading = true; state.error = null; })
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
