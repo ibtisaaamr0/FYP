@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const BACKEND_URL = 'http://10.0.2.2:5000'; // Emulator IP. Use your PC IP if on real device.
+const BACKEND_URL = 'http://10.0.2.2:5000'; 
 
 export default function Sign() {
   const [gesture, setGesture] = useState("Connecting...");
@@ -17,10 +17,9 @@ export default function Sign() {
           setLoading(false);
         })
         .catch(err => {
-            // console.log(err);
             setGesture("Backend Disconnected"); 
         });
-    }, 500); // Poll every 500ms
+    }, 1000); 
 
     return () => clearInterval(interval);
   }, []);
