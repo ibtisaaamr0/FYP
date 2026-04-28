@@ -2,6 +2,7 @@ flask
 flask-cors
 opencv-python
 numpy
+mediapipe
 sounddevice
 SpeechRecognition
 pyaudio

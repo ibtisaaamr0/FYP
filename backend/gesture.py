@@ -1,113 +1,115 @@
 import cv2
+import mediapipe as mp
 import numpy as np
-import math
-from collections import deque
 import threading
+from collections import deque
 
 class GestureRecognizer:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
+        # Initialize variables to None/defaults first to avoid __del__ errors
+        self.cap = None
+        self.hands = None
+        self.current_gesture = "Initializing..."
         self.buffer = deque(maxlen=5)
-        self.current_gesture = "No hand"
         self.lock = threading.Lock()
-        self.running = True
+
+        try:
+            # 1. Setup MediaPipe
+            self.mp_hands = mp.solutions.hands
+            self.mp_draw = mp.solutions.drawing_utils
+            self.hands = self.mp_hands.Hands(
+                static_image_mode=False,
+                max_num_hands=1,
+                min_detection_confidence=0.7,
+                min_tracking_confidence=0.5
+            )
+            
+            # 2. Setup Camera for local debugging
+            # If your PC has NO camera, this will fail gracefully
+            self.cap = cv2.VideoCapture(0)
+            if not self.cap.isOpened():
+                print("⚠️ Warning: No webcam detected. Mobile API will still work.")
+            
+            self.current_gesture = "Searching..."
+            
+        except AttributeError:
+            print("❌ Error: MediaPipe 'solutions' not found. Ensure no file is named 'mediapipe.py'.")
+        except Exception as e:
+            print(f"❌ Initialization Error: {e}")
 
     def __del__(self):
-        self.cap.release()
+        """Safe cleanup to prevent crashes if init failed"""
+        if hasattr(self, 'cap') and self.cap is not None:
+            if self.cap.isOpened():
+                self.cap.release()
 
-    def get_frame(self):
-        success, frame = self.cap.read()
-        if not success:
-            return None, "Error"
+    def recognize_from_frame(self, frame):
+        """
+        Main processing logic used by mobile API (app.py)
+        """
+        if self.hands is None:
+            return frame, "AI Model Error"
 
+        # 1. Image Pre-processing
         frame = cv2.flip(frame, 1)
+        img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = self.hands.process(img_rgb)
         
-        # --- UI Styling ---
-        # Draw a semi-transparent overlay for the ROI
-        overlay = frame.copy()
-        cv2.rectangle(overlay, (95, 95), (405, 405), (0, 0, 0), -1)
-        cv2.addWeighted(overlay, 0.3, frame, 0.7, 0, frame)
-        
-        # Draw the ROI border with a nice color (Cyan)
-        cv2.rectangle(frame, (100, 100), (400, 400), (255, 255, 0), 2)
+        gesture = "Searching..."
 
-        roi = frame[100:400, 100:400]
-        
-        # Skin detection
-        ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-        lower = np.array([0, 133, 77], np.uint8)
-        upper = np.array([255, 173, 127], np.uint8)
-        mask = cv2.inRange(ycrcb, lower, upper)
-        
-        mask = cv2.GaussianBlur(mask, (5, 5), 0)
-        mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)
-
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        gesture = "No hand"
-        
-        if contours:
-            cnt = max(contours, key=cv2.contourArea)
-            area = cv2.contourArea(cnt)
-            
-            if area > 2000:
-                hull = cv2.convexHull(cnt)
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Draw skeleton on the frame
+                self.mp_draw.draw_landmarks(frame, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
                 
-                # Draw improved contours
-                cv2.drawContours(roi, [cnt], -1, (0, 255, 0), 2) # Green for hand
-                cv2.drawContours(roi, [hull], -1, (0, 200, 255), 2) # Orange for hull
+                lm = hand_landmarks.landmark
+                
+                # --- PSL LOGIC (Finger Counting Base) ---
+                fingers = []
+                # Thumb: Horizontal check
+                fingers.append(1 if lm[4].x < lm[3].x else 0)
+                # Fingers: Tip Y vs Pip Y (In MediaPipe, lower Y is higher on screen)
+                for tip, pip in [(8, 6), (12, 10), (16, 14), (20, 18)]:
+                    fingers.append(1 if lm[tip].y < lm[pip].y else 0)
 
-                hull_indices = cv2.convexHull(cnt, returnPoints=False)
-                defect_count = 0
+                total_fingers = sum(fingers)
+                
+                # Mapping simple gestures (Week 1-2 targets)
+                if total_fingers == 5:
+                    gesture = "Salaam / Hello"
+                elif total_fingers == 0:
+                    gesture = "Fist / Wait"
+                elif fingers == [0, 1, 1, 0, 0]:
+                    gesture = "Victory / Peace"
+                elif fingers == [0, 1, 0, 0, 0]:
+                    gesture = "Pointing / One"
+                else:
+                    gesture = "Analyzing PSL..."
 
-                if len(hull_indices) > 3:
-                    defects = cv2.convexityDefects(cnt, hull_indices)
-                    if defects is not None:
-                        for i in range(defects.shape[0]):
-                            s, e, f, d = defects[i, 0]
-                            start = tuple(cnt[s][0])
-                            end = tuple(cnt[e][0])
-                            far = tuple(cnt[f][0])
-                            
-                            a = math.dist(start, end)
-                            b = math.dist(start, far)
-                            c = math.dist(end, far)
-                            
-                            angle = math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c + 1e-5))
-                            
-                            if angle <= math.pi / 2:
-                                defect_count += 1
-                                # Draw nice defect points
-                                cv2.circle(roi, far, 8, (0, 0, 255), -1) 
-                                cv2.circle(roi, far, 3, (255, 255, 255), -1)
-
-                x, y, w, h = cv2.boundingRect(cnt)
-                aspect = h / w if w != 0 else 0
-
-                # Gesture Logic
-                if defect_count >= 4:
-                    gesture = "✋ Open Palm"
-                elif defect_count == 0 and area > 8000:
-                    if aspect > 1.5 and w < 120:
-                        gesture = "👍 Thumb Up"
-                    else:
-                        gesture = "✊ Fist"
-        
-        # Thread-safe buffer update
+        # Update buffer for stability (prevents flickering)
         with self.lock:
             self.buffer.append(gesture)
-            if self.buffer:
-                self.current_gesture = max(set(self.buffer), key=self.buffer.count)
+            self.current_gesture = max(set(self.buffer), key=self.buffer.count)
 
-        # --- Dashboard UI Overlay ---
-        # Add a sleek top bar
-        cv2.rectangle(frame, (0, 0), (frame.shape[1], 80), (30, 30, 30), -1)
-        
-        # Display Gesture Text with shadow for readability
-        text = f"Gesture: {self.current_gesture}"
-        cv2.putText(frame, text, (52, 52), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4) # Shadow
-        cv2.putText(frame, text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0) if self.current_gesture != "No hand" else (100, 100, 100), 4)
+        return frame, self.current_gesture
 
-        # Encode frame
-        ret, jpeg = cv2.imencode('.jpg', frame)
-        return jpeg.tobytes(), self.current_gesture
+    def get_frame(self):
+        """
+        Captures from PC webcam (if available) for the local dashboard
+        """
+        if self.cap is None or not self.cap.isOpened():
+            return None, "No Camera"
+
+        success, frame = self.cap.read()
+        if not success:
+            return None, "Hardware Error"
+
+        processed_frame, gesture = self.recognize_from_frame(frame)
+
+        # Overlay result for the local window
+        cv2.rectangle(processed_frame, (0, 0), (processed_frame.shape[1], 70), (20, 20, 20), -1)
+        cv2.putText(processed_frame, f"PSL: {gesture}", (30, 45), 
+                    cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
+
+        ret, jpeg = cv2.imencode('.jpg', processed_frame)
+        return jpeg.tobytes(), gesture

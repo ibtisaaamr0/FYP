@@ -1,6 +1,8 @@
 from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
-import threading
+import base64
+import cv2
+import numpy as np
 import time
 from gesture import GestureRecognizer
 from voice_recognition import VoiceRecognizer
@@ -12,53 +14,62 @@ CORS(app)
 gesture_recognizer = GestureRecognizer()
 voice_recognizer = VoiceRecognizer()
 
-def generate_frames():
-    """Generator function for video streaming"""
-    while True:
-        frame_bytes, _ = gesture_recognizer.get_frame()
-        if frame_bytes:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-        else:
-            time.sleep(0.01)
+@app.route('/process_frame', methods=['POST'])
+def process_frame():
+    """
+    Receives Base64 from React Native, processes it via gesture.py,
+    and returns the prediction to the phone.
+    """
+    data = request.json
+    if not data or 'image' not in data:
+        return jsonify({"error": "No image data"}), 400
 
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "ok", "message": "Backend is running"})
+    try:
+        # 1. Decode Base64 image string
+        img_data = base64.b64decode(data['image'])
+        nparr = np.frombuffer(img_data, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-@app.route('/video_feed')
-def video_feed():
-    """Video streaming route. Put this in the src of an img tag."""
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        if frame is None:
+            return jsonify({"error": "Invalid image frame"}), 400
 
-@app.route('/gesture', methods=['GET'])
-def get_gesture():
-    """Get the current gesture prediction."""
-    return jsonify({
-        "gesture": gesture_recognizer.current_gesture,
-        "timestamp": time.time()
-    })
+        # 2. Run AI Inference
+        # Unpacking the tuple from your updated gesture.py
+        _, prediction = gesture_recognizer.recognize_from_frame(frame)
+
+        # 3. Return the prediction to the phone
+        return jsonify({
+            "gesture": prediction,
+            "timestamp": time.time()
+        })
+        
+    except Exception as e:
+        print(f"Server Error during gesture processing: {e}")
+        return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/listen', methods=['GET'])
 def listen_audio():
     """
-    Trigger voice recording and return text.
-    Query Params:
-    - language: 'en-US' (default) or 'ur-PK'
-    - duration: int (default 5)
+    Triggers the microphone on the PC/Server and returns recognized text 
+    PLUS the sequence of animation labels for the Avatar.
     """
+    # Use 'ur-PK' for Urdu or 'en-US' for English
     language = request.args.get('language', 'en-US')
-    try:
-        duration = int(request.args.get('duration', 5))
-    except ValueError:
-        duration = 5
+    
+    # This now returns: {"text": "...", "labels": [...], "language": "..."}
+    result = voice_recognizer.recognize(language=language)
+    
+    return jsonify(result)
 
-    text = voice_recognizer.recognize(language=language, duration=duration)
+@app.route('/health', methods=['GET'])
+def health():
+    """Quick check to see if the server is reachable from the emulator/phone"""
     return jsonify({
-        "text": text,
-        "language": language
+        "status": "ready", 
+        "server_time": time.time(),
+        "modules": ["gesture", "voice"]
     })
 
 if __name__ == '__main__':
-    # Run on 0.0.0.0 to be accessible from local network (emulator/device)
+    # host='0.0.0.0' is critical for mobile connectivity
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True, use_reloader=False)

@@ -1,18 +1,36 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground } from "react-native";
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  Image, 
+  ImageBackground, 
+  Dimensions, 
+  Platform 
+} from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+// Animation & Gesture Imports
+import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
+import Animated, { 
+  useAnimatedGestureHandler, 
+  useAnimatedStyle, 
+  useSharedValue, 
+  withSpring, 
+  runOnJS,
+  interpolate,
+  Extrapolate
+} from "react-native-reanimated";
+
 // REDUX IMPORTS
-import { Provider, useSelector, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "./Redux/store";
-import { toggleTheme } from "./Redux/features/themeSlice";
 
 // ASSETS & SCREENS
 import Logo from "./logo.png";
-import Bg from "./bg.jpeg";
-import Bg1 from "./bg1.jpeg";
+import Bg1 from "./bg1.jpeg"; // Assuming Bg1 is your dark/vibrant image
 import Tabs from "./component/tabs";
 import Login from "./screens/login";
 import Signup from "./screens/signup";
@@ -23,49 +41,78 @@ import PrivacySecurity from "./screens/Privacy_Security";
 import HelpSupport from "./screens/Help_and_SUpport";
 import ForgotPassword from "./screens/ForgotPass";
 
+const { width } = Dimensions.get("window");
+const SLIDER_WIDTH = width * 0.85;
+const KNOB_SIZE = 60;
+const END_POSITION = SLIDER_WIDTH - KNOB_SIZE - 12; // 12 is for padding
+
 const Stack = createNativeStackNavigator();
 
+// --- MODERN GLASS SWIPE COMPONENT ---
+const SwipeSlider = ({ onSwipeComplete }) => {
+  const X = useSharedValue(0);
 
-function HomeScreen({ navigation }) {
-  const dispatch = useDispatch();
-  // Get theme from Redux instead of local state
-const isDarkMode = useSelector((state) => state.theme?.isDarkMode || false);
-  const backgroundColor = isDarkMode ? "#000" : "#f3f7f9";
-  const TextColor = isDarkMode ? "#f2f2f2" : "#2c3e50";
-  const ButtonTextColor = isDarkMode ? "#000" : "#fff";
-  const BG = isDarkMode ? Bg1 : Bg;
-  const buttonColor = isDarkMode ? "#c8e265" : "#000";
+  const animatedGestureHandler = useAnimatedGestureHandler({
+    onActive: (event) => {
+      X.value = Math.max(0, Math.min(event.translationX, END_POSITION));
+    },
+    onEnd: () => {
+      if (X.value > END_POSITION * 0.8) {
+        X.value = withSpring(END_POSITION);
+        runOnJS(onSwipeComplete)();
+      } else {
+        X.value = withSpring(0);
+      }
+    },
+  });
+
+  const animatedKnobStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: X.value }],
+  }));
+
+  const animatedTextStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(X.value, [0, END_POSITION * 0.5], [0.8, 0], Extrapolate.CLAMP),
+  }));
 
   return (
-    <ImageBackground source={BG} style={styles.background} resizeMode="cover">
-      <View style={[styles.overlay, { backgroundColor: backgroundColor + "B0" }]}>
-        <Pressable onPress={() => dispatch(toggleTheme())} style={styles.themeIcon}>
-          <FontAwesome5
-            name={isDarkMode ? "sun" : "moon"}
-            size={22}
-            color={isDarkMode ? "#fff" : "#222"}
-          />
-        </Pressable>
+    <View style={styles.sliderTrack}>
+      <Animated.Text style={[styles.sliderText, animatedTextStyle]}>
+        Swipe to Enter
+      </Animated.Text>
+      
+      <PanGestureHandler onGestureEvent={animatedGestureHandler}>
+        <Animated.View style={[styles.sliderKnob, animatedKnobStyle]}>
+          <FontAwesome5 name="chevron-right" size={22} color="#000" />
+        </Animated.View>
+      </PanGestureHandler>
+    </View>
+  );
+};
 
-        <Image source={Logo} style={styles.Image} />
-        <Text style={[styles.text, { color: TextColor }]}>
-          "Breaking Barriers, One Sign at a Time."
-        </Text>
-
-        <Pressable
-          style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={() => navigation.navigate("Tabs")}
-        >
-          <Text style={[styles.buttonText, { color: ButtonTextColor }]}>
-            Off to main menu
+// --- HOME SCREEN ---
+function HomeScreen({ navigation }) {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ImageBackground source={Bg1} style={styles.background} resizeMode="cover">
+        {/* Permanent dark cinematic overlay */}
+        <View style={styles.overlay}>
+          
+          <Image source={Logo} style={styles.Image} />
+          
+          <Text style={styles.text}>
+            "Breaking Barriers,{"\n"}One Sign at a Time."
           </Text>
-        </Pressable>
-      </View>
-    </ImageBackground>
+
+          <View style={styles.footer}>
+            <SwipeSlider onSwipeComplete={() => navigation.navigate("Login")} />
+          </View>
+        </View>
+      </ImageBackground>
+    </GestureHandlerRootView>
   );
 }
 
-// MAIN APP COMPONENT
+// --- MAIN APP ---
 export default function App() {
   return (
     <Provider store={store}>
@@ -89,10 +136,74 @@ export default function App() {
 
 const styles = StyleSheet.create({
   background: { flex: 1, width: "100%", height: "100%" },
-  overlay: { flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 40, paddingHorizontal: 20 },
-  themeIcon: { position: "absolute", top: 45, right: 25, padding: 8, borderRadius: 50, backgroundColor: "rgba(255,255,255,0.3)" },
-  Image: { width: "65%", height: "50%", marginBottom: 10 },
-  text: { fontSize: 28, fontStyle: "italic", fontWeight: "500", width: "80%", textAlign: "center" },
-  button: { width: "50%", padding: 12, justifyContent: "center", alignItems: "center", borderRadius: 30, borderWidth: 1, marginTop: 50 },
-  buttonText: { fontWeight: "bold", fontSize: 17, fontStyle: "italic" },
+  overlay: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "rgba(0,0,0,0.7)", // Deep cinematic dark overlay
+    paddingHorizontal: 20 
+  },
+  Image: { 
+    width: width * 0.7, 
+    height: width * 0.7, 
+    marginBottom: 10, 
+    resizeMode: "contain" 
+  },
+  text: { 
+    fontSize: 24, 
+    fontStyle: "italic", 
+    fontWeight: "600", 
+    color: "#fff", 
+    textAlign: "center", 
+    width: "80%",
+    lineHeight: 34,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8
+  },
+  footer: { 
+    position: "absolute", 
+    bottom: 80, 
+    width: "100%", 
+    alignItems: "center" 
+  },
+  // --- MODERN SLIDER STYLES ---
+  sliderTrack: {
+    width: SLIDER_WIDTH,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(255,255,255,0.12)", // Glass effect
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+    ...Platform.select({
+      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 },
+      android: { elevation: 8 }
+    })
+  },
+  sliderKnob: {
+    width: KNOB_SIZE,
+    height: KNOB_SIZE,
+    borderRadius: KNOB_SIZE / 2,
+    backgroundColor: "#C8E265", // Vibrant accent color
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#C8E265",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+  },
+  sliderText: {
+    position: "absolute",
+    alignSelf: "center",
+    width: "100%",
+    textAlign: "center",
+    left: 20,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    letterSpacing: 1.5,
+    textTransform: "uppercase"
+  },
 });
